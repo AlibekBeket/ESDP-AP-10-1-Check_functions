@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat</title>
+</head>
+<body>
+<h1>Chat</h1>
+<div id="container">
+</div>
+<input type="text" id="message">
+<button type="submit" id="sending"> |> </button>
+<div class="user_id" id="3"></div>
+<script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script>
+    function chatPrint() {
+        const container = document.getElementById('container');
+        const chat = document.createElement('div');
+        container.append(chat)
+        $.ajax({
+            url: 'http://127.0.0.1:8000/chat/',
+            method: 'GET',
+            success: function(data, status) {
+                console.log(data);
+                for (let i = 0; i < data.chats.length; i++) {
+                    const chatBlock = document.createElement('div');
+                    const nameBlock = document.createElement('div');
+                    const messageBlock = document.createElement('div');
+                    nameBlock.append(data.chats[i][0].user.username);
+                    messageBlock.append(data.chats[i][0].message);
+                    chatBlock.append(nameBlock, messageBlock);
+                    chat.append(chatBlock);
+                };
+            },
+            error: function(response, status) {
+            }
+        });
+        setTimeout(function() {
+            chat.remove();
+            chatPrint();}, 1000
+        );
+    }
+    chatPrint()
+    var k = document.getElementById('sending');
+    k.addEventListener('click', clickButton);
+    function clickButton() {
+        const message = document.getElementById('message').value
+        const userId = document.getElementsByClassName('user_id')[0]
+        let data = {'user_id': Number(userId.id), 'message': message};
+        console.log(data);
+        $.ajax({
+            type: "POST",
+            data: JSON.stringify(data),
+            url: `http://127.0.0.1:8000/sending/`
+        });
+    }
+</script>
+</body>
+</html>
